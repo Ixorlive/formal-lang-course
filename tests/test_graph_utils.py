@@ -8,29 +8,50 @@ def test_get_graph_info_by_name():
     stats = get_graph_info_by_name("skos")
     assert stats.number_of_nodes == 144
     assert stats.number_of_edges == 252
-    assert stats.edge_labels == {'isDefinedBy', 'range', 'definition', 'inverseOf', 'creator', 'unionOf', 'subClassOf',
-                                 'label', 'seeAlso', 'contributor', 'title', 'disjointWith', 'rest', 'comment', 'first',
-                                 'domain', 'scopeNote', 'description', 'type', 'subPropertyOf', 'example'}
+
+    assert stats.edge_labels == {
+        "isDefinedBy",
+        "range",
+        "definition",
+        "inverseOf",
+        "creator",
+        "unionOf",
+        "subClassOf",
+        "label",
+        "seeAlso",
+        "contributor",
+        "title",
+        "disjointWith",
+        "rest",
+        "comment",
+        "first",
+        "domain",
+        "scopeNote",
+        "description",
+        "type",
+        "subPropertyOf",
+        "example",
+    }
 
 
 def test_create_labeled_two_cycles_graph():
     n = 3
     m = 3
-    labels = ('x', 'y')
+    labels = ("x", "y")
     graph = create_labeled_two_cycles_graph(n, m, labels)
     graph_info = get_graph_info(graph)
     assert graph_info == GraphInfo(
         number_of_nodes=7,
         number_of_edges=8,
-        edge_labels={'y', 'x'},
+        edge_labels={"y", "x"},
     )
 
 
 def test_create_and_save_labeled_two_cycles_graph():
     n = 5
     m = 5
-    labels = ('x', 'y')
-    path = 'test_two_cycles.dot'
+    labels = ("x", "y")
+    path = "test_two_cycles.dot"
     create_and_save_labeled_two_cycles_graph(n, m, labels, path)
     assert os.path.exists(path)
     with open(path) as file:

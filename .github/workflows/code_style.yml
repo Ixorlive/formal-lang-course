@@ -54,4 +54,4 @@ jobs:
       # Run pre-commit on all the files in the repo
       - name: Run pre-commit
         run: |
-          pre-commit run --all-files --color always --verbose --show-diff-on-failure
+            pre-commit run --all-files --color always --verbose --show-diff-on-failure
