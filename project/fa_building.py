@@ -21,8 +21,7 @@ def build_minimal_dfa_by_regex(regex: str) -> DeterministicFiniteAutomaton:
     """
     reg_expr = Regex(regex)
     nfa = reg_expr.to_epsilon_nfa()
-    dfa = nfa.to_deterministic()
-    minimal_dfa = dfa.minimize()
+    minimal_dfa = nfa.minimize()
     return minimal_dfa
 
 
