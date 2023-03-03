@@ -1,7 +1,7 @@
 from typing import Tuple, NamedTuple, Set, Union, Iterable, Any
 
 import networkx.drawing.nx_pydot
-from networkx import MultiGraph
+from networkx import MultiDiGraph
 import cfpq_data
 
 
@@ -11,7 +11,7 @@ class GraphInfo(NamedTuple):
     edge_labels: Set[str]
 
 
-def get_graph_info(graph: MultiGraph) -> GraphInfo:
+def get_graph_info(graph: MultiDiGraph) -> GraphInfo:
     """
     Computes statistics about a MultiGraph object.
 
@@ -29,7 +29,7 @@ def get_graph_info(graph: MultiGraph) -> GraphInfo:
     return GraphInfo(graph.number_of_nodes(), graph.number_of_edges(), edge_labels)
 
 
-def download_graph(graph_name: str) -> MultiGraph:
+def download_graph(graph_name: str) -> MultiDiGraph:
     """
     Downloads a graph with the given name from the cfpq_data library.
 
@@ -58,7 +58,7 @@ def get_graph_info_by_name(graph_name: str) -> GraphInfo:
     return get_graph_info(multi_graph)
 
 
-def save_graph(graph: MultiGraph, path: str):
+def save_graph(graph: MultiDiGraph, path: str):
     """
     Saves the specified MultiGraph to a file in DOT format at the specified path.
 
@@ -71,7 +71,7 @@ def save_graph(graph: MultiGraph, path: str):
 
 def create_labeled_two_cycles_graph(
     n: Union[int, Iterable[Any]], m: Union[int, Iterable[Any]], labels: Tuple[str, str]
-) -> MultiGraph:
+) -> MultiDiGraph:
     """
     Creates a labeled two-cycle graph with the specified number of vertices and labels, and saves it to a file in DOT format at the specified path.
 
