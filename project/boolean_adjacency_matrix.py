@@ -13,6 +13,8 @@ class BooleanAdjacencyMatrix:
             self._build_adjacency_matrices(nfa)
 
     def _build_adjacency_matrices(self, nfa: EpsilonNFA) -> None:
+        # Builds the boolean adjacency matrices from finite automata
+        # nfa: an EpsilonNFA to use for building the matrix
         num_states = len(nfa.states)
         self.num_states = num_states
         states = {state: ind for ind, state in enumerate(nfa.states)}
@@ -32,6 +34,7 @@ class BooleanAdjacencyMatrix:
         self.final_states[0, [states[i] for i in nfa.final_states]] = True
 
     def to_nfa(self) -> EpsilonNFA:
+        # Returns finite automata that represents the BooleanAdjacencyMatrix
         res = EpsilonNFA()
         for label in self.adj_matrices:
             for start, final in zip(*self.adj_matrices[label].nonzero()):
@@ -45,6 +48,8 @@ class BooleanAdjacencyMatrix:
     def get_intersection(
         self, other: "BooleanAdjacencyMatrix"
     ) -> "BooleanAdjacencyMatrix":
+        # Returns a new BooleanAdjacencyMatrix that is the intersection of the current matrix and another
+        # other: a BooleanAdjacencyMatrix object to intersect with the current matrix
         intersected_matrix = BooleanAdjacencyMatrix()
         cross_labels = self.adj_matrices.keys() & other.adj_matrices.keys()
         for label in cross_labels:
@@ -58,6 +63,7 @@ class BooleanAdjacencyMatrix:
         return intersected_matrix
 
     def get_transitive_closure(self) -> dok_matrix:
+        # Returns a transitive closure matrix for the current BooleanAdjacencyMatrix
         tc_matrix = sum(self.adj_matrices.values())
         prev = 0
         while tc_matrix.count_nonzero() != prev:
