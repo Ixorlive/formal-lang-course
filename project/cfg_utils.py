@@ -5,7 +5,8 @@ def to_weak_cfg(cfg: CFG) -> CFG:
     grammar = cfg.eliminate_unit_productions().remove_useless_symbols()
     grammar_prod = grammar._get_productions_with_only_single_terminals()
     return CFG(
-        start_symbol=grammar.start_symbol, productions=set(grammar._decompose_productions(grammar_prod))
+        start_symbol=grammar.start_symbol,
+        productions=set(grammar._decompose_productions(grammar_prod)),
     )
 
 
