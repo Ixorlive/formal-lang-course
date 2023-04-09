@@ -1,6 +1,7 @@
-from pyformlang.finite_automaton import EpsilonNFA
+from pyformlang.finite_automaton import EpsilonNFA, State
 from scipy import sparse
 from scipy.sparse import dok_matrix, kron
+from project.rfa import RFA
 
 
 class BooleanAdjacencyMatrix:
@@ -70,3 +71,52 @@ class BooleanAdjacencyMatrix:
             prev = tc_matrix.count_nonzero()
             tc_matrix += tc_matrix @ tc_matrix
         return tc_matrix
+
+    @staticmethod
+    def from_rfa(rfa: RFA):
+        """
+        Create a BooleanAdjacencyMatrix from a Recursive Finite Automaton (RFA)
+
+        Args:
+            rfa: A Recursive Finite Automaton to use for creating the adjacency matrix
+
+        Returns:
+            A BooleanAdjacencyMatrix that represents the given RFA
+        """
+        res = BooleanAdjacencyMatrix()
+
+        state_mapping = {}
+        counter = 0
+        for var, nfa in rfa.boxes.items():
+            for s in nfa.states:
+                state_mapping[State((var, s.value))] = counter
+                counter += 1
+
+        res.states_count = len(state_mapping)
+        res.dict = state_mapping.copy()
+
+        res.start_vector = dok_matrix((1, res.states_count), dtype=bool)
+        res.final_vector = dok_matrix((1, res.states_count), dtype=bool)
+
+        for var, nfa in rfa.boxes.items():
+            for s in nfa.start_states:
+                res.start_vector[0, state_mapping[State((var, s.value))]] = True
+
+            for s in nfa.final_states:
+                res.final_vector[0, state_mapping[State((var, s.value))]] = True
+
+            for start, final_dict in nfa.to_dict().items():
+                for label, final_states in final_dict.items():
+                    if not isinstance(final_states, set):
+                        final_states = {final_states}
+                    for final in final_states:
+                        if label not in res.adj_matrices:
+                            res.adj_matrices[label] = dok_matrix(
+                                (res.states_count, res.states_count), dtype=bool
+                            )
+                        res.adj_matrices[label][
+                            state_mapping[State((var, start.value))],
+                            state_mapping[State((var, final.value))],
+                        ] = True
+
+        return res
