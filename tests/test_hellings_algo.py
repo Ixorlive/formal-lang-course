@@ -19,7 +19,7 @@ def test_hellings_algorithm():
     assert result == expected_result
 
 
-def test_hellings_algorithm2():
+def test_reachability_with_nonterminal():
     cfg_text = """
         S -> A B | B A
         A -> a A b | a b
@@ -39,32 +39,19 @@ def test_hellings_algorithm2():
     ]
     graph.add_edges_from(edges)
 
-    result = hellings_algorithm(cfg, graph)
+    start_vertices = graph.nodes
+    end_vertices = graph.nodes
+    target_nonterminal = Variable("S")
 
-    expected_result = {
-        (0, Variable("C#CNF#1"), 3),
-        (0, Variable("A"), 2),
-        (2, Variable("B"), 4),
-        (6, Variable("A"), 8),
-        (3, Variable("a#CNF#"), 4),
-        (6, Variable("a#CNF#"), 7),
-        (0, Variable("b#CNF#"), 5),
-        (5, Variable("a#CNF#"), 6),
-        (1, Variable("b#CNF#"), 2),
-        (2, Variable("b#CNF#"), 3),
-        (0, Variable("S"), 4),
-        (0, Variable("S"), 8),
-        (0, Variable("a#CNF#"), 1),
-        (7, Variable("b#CNF#"), 8),
-        (0, Variable("C#CNF#2"), 7),
-        (0, Variable("B"), 6),
-    }
-    assert len(expected_result) == len(result)
-    for expected in expected_result:
-        assert expected in result
+    result = reachability_with_nonterminal(
+        cfg, graph, start_vertices, end_vertices, target_nonterminal
+    )
+
+    expected_result = {(0, 8), (0, 4)}
+    assert expected_result == result
 
 
-def test_reachability_with_nonterminal():
+def test_reachability_with_nonterminal2():
     cfg_text = """
         S -> A B
         S -> A S1
