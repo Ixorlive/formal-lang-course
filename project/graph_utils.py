@@ -2,8 +2,8 @@ from collections import defaultdict, deque
 from itertools import product
 from typing import Tuple, NamedTuple, Set, Union, Iterable, Any
 
-import networkx.drawing.nx_pydot
-from networkx import MultiDiGraph
+import networkx.drawing.nx_pydot as nx_pydot
+from networkx import MultiDiGraph, read_graphml
 from pyformlang.cfg import CFG, Terminal, Variable
 import cfpq_data
 
@@ -71,7 +71,7 @@ def save_graph(graph: MultiDiGraph, path: str):
     - graph: the MultiGraph to save
     - path: the path to the file where the DOT representation of the graph will be saved
     """
-    networkx.drawing.nx_pydot.write_dot(graph, path)
+    nx_pydot.write_dot(graph, path)
 
 
 def create_labeled_two_cycles_graph(
@@ -107,7 +107,9 @@ def get_cnf(cfg: CFG) -> CFG:
     return weak_cfg.to_normal_form()
 
 
-def hellings_algorithm(cfg: CFG, graph: MultiDiGraph) -> Set[Tuple[str, str, str]]:
+def hellings_algorithm(
+    cfg: Union[str, CFG], graph: MultiDiGraph
+) -> Set[Tuple[str, str, str]]:
     """
     Computes the reachability information for all pairs of vertices in the given graph and context-free grammar.
 
@@ -119,6 +121,8 @@ def hellings_algorithm(cfg: CFG, graph: MultiDiGraph) -> Set[Tuple[str, str, str
         Set[Tuple[int, Variable, int]]: A set of triples (start_vertex, nonterminal, end_vertex)
         representing the reachability information for all pairs of vertices in the graph.
     """
+    if isinstance(cfg, str):
+        cfg = cfg_from_text(cfg)
     if graph.number_of_nodes() == 0:
         return set()
 
@@ -160,8 +164,39 @@ def hellings_algorithm(cfg: CFG, graph: MultiDiGraph) -> Set[Tuple[str, str, str
     return result
 
 
+def hellings_algorithm_from_file(
+    cfg: Union[str, CFG], path_to_graph: str
+) -> Set[Tuple[str, str, str]]:
+    """
+    Runs the Hellings algorithm on a graph read from a file.
+
+    The file should contain one edge per line, with each line formatted as "source_node target_node edge_label".
+
+    Args:
+        cfg: The context-free grammar to use for the algorithm, either as a string or as a CFG object.
+        path_to_graph: The path to the file containing the graph.
+
+    Returns:
+        The set of all valid paths through the graph that match the grammar, as tuples of (start_node, end_node, label).
+    """
+    graph = MultiDiGraph()
+    with open(path_to_graph, "r") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                source_node, target_node, edge_label = line.split()
+                graph.add_edge(int(source_node), int(target_node), label=edge_label)
+    return hellings_algorithm(cfg, graph)
+
+
+def hellings_algorithm_from_pydot(
+    cfg: Union[str, CFG], dot_file: str
+) -> Set[Tuple[str, str, str]]:
+    return hellings_algorithm(cfg, nx_pydot.from_pydot(dot_file))
+
+
 def reachability_with_nonterminal(
-    grammar: CFG,
+    grammar: Union[str, CFG],
     graph: MultiDiGraph,
     start_vertices: Set,
     end_vertices: Set,
@@ -182,6 +217,8 @@ def reachability_with_nonterminal(
         Set[Tuple[int, int]]: A set of pairs (start_vertex, end_vertex) representing the reachability
         information for the specified start and end vertices and the given nonterminal in the CFG.
     """
+    if isinstance(grammar, str):
+        cfg = cfg_from_text(grammar)
     reachability = hellings_algorithm(grammar, graph)
 
     filtered_reachability = {
