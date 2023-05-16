@@ -11,7 +11,7 @@ val =
     String of string
   | Int of int
   | Bool of bool
-  | Null 
+  | Null
   | Set of Set<val>
   | List if List<val>
 
@@ -89,7 +89,7 @@ expr := var
       | expr '.' expr   // concat
       | expr '|' expr   // union
       | expr '*'        // star
-      | expr 'in' expr  // contains     
+      | expr 'in' expr  // contains
       | var '[' int ']' // index of list
 
 lambda := pattern '=>' expr | '(' lambda ')';
@@ -108,14 +108,14 @@ print(get_vertices(g));
 start(g, {1,2,3});
 ```
 Добавить стартовые вершины
-``` 
+```
 add_start(g, {7,8});
 ```
 Получить стартовые вершины
-``` 
+```
 print(get_start(g));
 ```
-Фильтрация вершин 
+Фильтрация вершин
 ```
 filtered = filter((v) => v > 5, get_vertices(g));
 print(filtered);
