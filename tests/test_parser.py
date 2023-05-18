@@ -37,41 +37,39 @@ def test_parse_string():
     assert parsed is not None
 
 
-@pytest.mark.parametrize("input_string,expected", [
-    ("a = 1;", True),
-    ("a = start(b, c);", True),
-    ("a = qwer;", True),
-    ("a = 1;", True),
-    (example_code, True),
-
-    # compound operations
-    ("a = b & c;", True),
-    ("a = b . c;", True),
-    ("a = b | c;", True),
-    ("a = b *;", True),
-    ("a = b in c;", True),
-    ("a = b[5];", True),
-
-    # set/list operations
-    ("a = {1, 2, 3};", True),
-    ("a = [1, 2, 3];", True),
-
-    # lambda operations
-    ("a = map((x) => x, {1,2,3});", True),
-    ("a = map((b) => x in a, gg);", True),
-    ("a = filter((x) => x in b, start(g,{1,23}));", True),
-
-    ("a = start(", False),
-    ("a = start(a);", False),
-    ("a = load((\"a\");", False),
-    ("a == start(b c);", False),
-    ("a = start(b, ;", False),
-    ("a = {1, 2, ;", False),
-    ("a = [1, 2, ;", False),
-    ("a = map((x) => x * 2, [1, 2, ;", False),
-    ("a = filter((x) => x > 2, [1, 2, ;", False),
-
-])
+@pytest.mark.parametrize(
+    "input_string,expected",
+    [
+        ("a = 1;", True),
+        ("a = start(b, c);", True),
+        ("a = qwer;", True),
+        ("a = 1;", True),
+        (example_code, True),
+        # compound operations
+        ("a = b & c;", True),
+        ("a = b . c;", True),
+        ("a = b | c;", True),
+        ("a = b *;", True),
+        ("a = b in c;", True),
+        ("a = b[5];", True),
+        # set/list operations
+        ("a = {1, 2, 3};", True),
+        ("a = [1, 2, 3];", True),
+        # lambda operations
+        ("a = map((x) => x, {1,2,3});", True),
+        ("a = map((b) => x in a, gg);", True),
+        ("a = filter((x) => x in b, start(g,{1,23}));", True),
+        ("a = start(", False),
+        ("a = start(a);", False),
+        ('a = load(("a");', False),
+        ("a == start(b c);", False),
+        ("a = start(b, ;", False),
+        ("a = {1, 2, ;", False),
+        ("a = [1, 2, ;", False),
+        ("a = map((x) => x * 2, [1, 2, ;", False),
+        ("a = filter((x) => x > 2, [1, 2, ;", False),
+    ],
+)
 def test_check_correction_string(input_string, expected):
     assert check_correction_string(input_string) is expected
 
@@ -108,7 +106,7 @@ def test_generate_dot_text_with_invalid_string():
 
 
 def test_generate_dot_text_example():
-    with open("language_example_dot.dot", 'r') as file:
+    with open("language_example_dot.dot", "r") as file:
         expected = file.read()
     output = generate_dot_text(example_code)
     assert output == expected

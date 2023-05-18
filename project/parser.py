@@ -65,7 +65,7 @@ class DotGeneratingVisitor(LanguageVisitor):
         self.node_counter += 1
 
         label = f"{node_name}: {ctx.getText()}" if ctx.children is None else node_name
-        self.graph.append(f"{node_id} [label=\"{label}\"]")
+        self.graph.append(f'{node_id} [label="{label}"]')
 
         if not isinstance(ctx.parentCtx, type(None)):
             parent_id = self.node_ids.get(ctx.parentCtx, None)
@@ -132,34 +132,10 @@ def generate_dot_text(input_stream: Union[str, InputStream], from_file: bool = F
     return visitor.get_dot_graph()
 
 
-def generate_dot(input_stream: Union[str, InputStream], from_file: bool = False, output: str = "output.dot"):
+def generate_dot(
+    input_stream: Union[str, InputStream],
+    from_file: bool = False,
+    output: str = "output.dot",
+):
     with open(output, "w") as file:
         file.write(generate_dot_text(input_stream, from_file))
-
-example_code = """
-// Program start
-gg = load("graph1.dot");
-gg2 = load("graph2.dot");
-
-intermediate = start(final(gg2, get_vertices(gg)), {1,2,3,4,5});
-
-l1 = "type1" | "type2";
-q1 = ("meta" | l1)*;
-q2 = "subclass" . l1;
-
-result1 = intermediate & q1;
-result2 = intermediate & q2;
-
-print(result1);
-
-start_nodes = get_start(gg);
-
-vertices_result1 = filter((node) => node in start_nodes, map((edge) => edge[0][0], get_edges(result1)));
-vertices_result2 = filter((node) => node in start_nodes, map((edge) => edge[0][0], get_edges(result2)));
-
-final_vertices = vertices_result1 & vertices_result2;
-
-print(final_vertices);
-// Program end
-"""
-print(generate_dot_text(example_code))
