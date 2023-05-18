@@ -6,7 +6,7 @@ digraph {
 1 -> 2
 3 [label="Var: gg"]
 2 -> 3
-4 [label="Expr: load(\"graph1.dot\")"]
+4 [label="Expr: load('graph1.dot')"]
 2 -> 4
 5 [label="Stmt"]
 0 -> 5
@@ -14,7 +14,7 @@ digraph {
 5 -> 6
 7 [label="Var: gg2"]
 6 -> 7
-8 [label="Expr: load(\"graph2.dot\")"]
+8 [label="Expr: load('graph2.dot')"]
 6 -> 8
 9 [label="Stmt"]
 0 -> 9
@@ -70,19 +70,19 @@ digraph {
 33 -> 34
 35 [label="Var: l1"]
 34 -> 35
-36 [label="Expr: \"type1\"|\"type2\""]
+36 [label="Expr: 'type1'|'type2'"]
 34 -> 36
-37 [label="Expr: \"type1\""]
+37 [label="Expr: 'type1'"]
 36 -> 37
-38 [label="Val "type1""]
+38 [label="Val 'type1'"]
 37 -> 38
-39 [label="Literal: "type1""]
+39 [label="Literal: 'type1'"]
 38 -> 39
-40 [label="Expr: \"type2\""]
+40 [label="Expr: 'type2'"]
 36 -> 40
-41 [label="Val "type2""]
+41 [label="Val 'type2'"]
 40 -> 41
-42 [label="Literal: "type2""]
+42 [label="Literal: 'type2'"]
 41 -> 42
 43 [label="Stmt"]
 0 -> 43
@@ -90,17 +90,17 @@ digraph {
 43 -> 44
 45 [label="Var: q1"]
 44 -> 45
-46 [label="Expr: (\"meta\"|l1)*"]
+46 [label="Expr: ('meta'|l1)*"]
 44 -> 46
-47 [label="Expr: (\"meta\"|l1)"]
+47 [label="Expr: ('meta'|l1)"]
 46 -> 47
-48 [label="Expr: \"meta\"|l1"]
+48 [label="Expr: 'meta'|l1"]
 47 -> 48
-49 [label="Expr: \"meta\""]
+49 [label="Expr: 'meta'"]
 48 -> 49
-50 [label="Val "meta""]
+50 [label="Val 'meta'"]
 49 -> 50
-51 [label="Literal: "meta""]
+51 [label="Literal: 'meta'"]
 50 -> 51
 52 [label="Expr: l1"]
 48 -> 52
@@ -112,13 +112,13 @@ digraph {
 54 -> 55
 56 [label="Var: q2"]
 55 -> 56
-57 [label="Expr: \"subclass\".l1"]
+57 [label="Expr: 'subclass'.l1"]
 55 -> 57
-58 [label="Expr: \"subclass\""]
+58 [label="Expr: 'subclass'"]
 57 -> 58
-59 [label="Val "subclass""]
+59 [label="Val 'subclass'"]
 58 -> 59
-60 [label="Literal: "subclass""]
+60 [label="Literal: 'subclass'"]
 59 -> 60
 61 [label="Expr: l1"]
 57 -> 61

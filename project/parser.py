@@ -87,7 +87,7 @@ class DotGeneratingVisitor(LanguageVisitor):
         return self.generic_visit("print", ctx)
 
     def visitLiteral(self, ctx: LanguageParser.LiteralContext):
-        return self.generic_visit("Literal: " + ctx.getText(), ctx)
+        return self.generic_visit("Literal: " + ctx.getText().replace('"', "'"), ctx)
 
     def visitSet(self, ctx: LanguageParser.SetContext):
         return self.generic_visit("Set " + ctx.getText(), ctx)
@@ -99,13 +99,13 @@ class DotGeneratingVisitor(LanguageVisitor):
         return self.generic_visit("List " + ctx.getText(), ctx)
 
     def visitVal(self, ctx: LanguageParser.ValContext):
-        return self.generic_visit("Val " + ctx.getText(), ctx)
+        return self.generic_visit("Val " + ctx.getText().replace('"', "'"), ctx)
 
     def visitVar(self, ctx: LanguageParser.VarContext):
-        return self.generic_visit(f"Var: {ctx.getText()}", ctx)
+        return self.generic_visit("Var: " + ctx.getText().replace('"', "'"), ctx)
 
     def visitExpr(self, ctx: LanguageParser.ExprContext):
-        return self.generic_visit("Expr: " + ctx.getText().replace('"', '\\"'), ctx)
+        return self.generic_visit("Expr: " + ctx.getText().replace('"', "'"), ctx)
 
     def visitLambda(self, ctx: LanguageParser.LambdaContext):
         return self.generic_visit("Lambda", ctx)
