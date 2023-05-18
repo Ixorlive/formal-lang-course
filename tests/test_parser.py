@@ -106,7 +106,7 @@ def test_generate_dot_text_with_invalid_string():
 
 
 def test_generate_dot_text_example():
-    with open("tests\\language_example_dot.dot", "r") as file:
+    with open("tests//language_example_dot.dot", "r") as file:
         expected = file.read()
     output = generate_dot_text(example_code) + "\n"  # ci
     assert output == expected
