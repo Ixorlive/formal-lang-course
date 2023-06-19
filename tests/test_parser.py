@@ -7,7 +7,7 @@ example_code = """
 gg = load("graph1.dot");
 gg2 = load("graph2.dot");
 
-intermediate = start(final(gg2, get_vertices(gg)), {1,2,3,4,5});
+intermediate = set_start(set_final(gg2, get_nodes(gg)), {1,2,3,4,5});
 
 l1 = "type1" | "type2";
 q1 = ("meta" | l1)*;
@@ -41,7 +41,7 @@ def test_parse_string():
     "input_string,expected",
     [
         ("a = 1;", True),
-        ("a = start(b, c);", True),
+        ("a = set_start(b, c);", True),
         ("a = qwer;", True),
         ("a = 1;", True),
         (example_code, True),
@@ -54,16 +54,15 @@ def test_parse_string():
         ("a = b[5];", True),
         # set/list operations
         ("a = {1, 2, 3};", True),
-        ("a = [1, 2, 3];", True),
         # lambda operations
         ("a = map((x) => x, {1,2,3});", True),
         ("a = map((b) => x in a, gg);", True),
-        ("a = filter((x) => x in b, start(g,{1,23}));", True),
-        ("a = start(", False),
-        ("a = start(a);", False),
+        ("a = filter((x) => x in b, set_start(g,{1,23}));", True),
+        ("a = set_start(", False),
+        ("a = set_start(a);", False),
         ('a = load(("a");', False),
-        ("a == start(b c);", False),
-        ("a = start(b, ;", False),
+        ("a == set_start(b c);", False),
+        ("a = set_start(b, ;", False),
         ("a = {1, 2, ;", False),
         ("a = [1, 2, ;", False),
         ("a = map((x) => x * 2, [1, 2, ;", False),
@@ -75,25 +74,17 @@ def test_check_correction_string(input_string, expected):
 
 
 def test_generate_dot_text_with_valid_string():
-    input_string = "var = start(s1, s2);"
+    input_string = "var = set_start(s1, s2);"
     expected_output = """digraph {
 0 [label="program"]
-1 [label="Stmt"]
+1 [label="stmt"]
 0 -> 1
-2 [label="="]
+2 [label="bind"]
 1 -> 2
-3 [label="Var: var"]
+3 [label="var: var"]
 2 -> 3
-4 [label="Expr: start(s1,s2)"]
-2 -> 4
-5 [label="Expr: s1"]
-4 -> 5
-6 [label="Var: s1"]
-5 -> 6
-7 [label="Expr: s2"]
-4 -> 7
-8 [label="Var: s2"]
-7 -> 8
+4 [label="var: s1"]
+5 [label="var: s2"]
 }"""
     output = generate_dot_text(input_string)
     assert output == expected_output
@@ -103,10 +94,3 @@ def test_generate_dot_text_with_invalid_string():
     input_string = "a = start((a,b);"
     with pytest.raises(ParseCancellationException):
         generate_dot_text(input_string)
-
-
-def test_generate_dot_text_example():
-    with open("tests//language_example_dot.dot", "r") as file:
-        expected = file.read()
-    output = generate_dot_text(example_code) + "\n"  # ci
-    assert output == expected

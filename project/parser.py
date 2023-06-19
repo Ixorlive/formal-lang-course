@@ -59,59 +59,50 @@ class DotGeneratingVisitor(LanguageVisitor):
         self.node_counter = 0
         self.node_ids = {}
 
-    def generic_visit(self, node_name, ctx):
+    def generic_visit(self, ctx, node_name):
         node_id = self.node_counter
         self.node_ids[ctx] = node_id
         self.node_counter += 1
 
-        label = f"{node_name}: {ctx.getText()}" if ctx.children is None else node_name
+        label = f"{node_name}: {getattr(ctx, 'getText', lambda: '')()}"
+        label = label if not hasattr(ctx, "children") else node_name
         self.graph.append(f'{node_id} [label="{label}"]')
 
-        if not isinstance(ctx.parentCtx, type(None)):
-            parent_id = self.node_ids.get(ctx.parentCtx, None)
+        parent_ctx = getattr(ctx, "parentCtx", None)
+        if parent_ctx is not None:
+            parent_id = self.node_ids.get(parent_ctx)
             if parent_id is not None:
                 self.graph.append(f"{parent_id} -> {node_id}")
 
-        return self.visitChildren(ctx)
+        if hasattr(ctx, "children") and ctx.children is not None:
+            for child in ctx.children:
+                self.visit(child)
+
+        return None
 
     def visitProgram(self, ctx: LanguageParser.ProgramContext):
-        return self.generic_visit("program", ctx)
+        return self.generic_visit(ctx, "program")
 
     def visitBind(self, ctx: LanguageParser.BindContext):
-        return self.generic_visit("=", ctx)
+        return self.generic_visit(ctx, "bind")
 
     def visitStmt(self, ctx: LanguageParser.StmtContext):
-        return self.generic_visit("Stmt", ctx)
+        return self.generic_visit(ctx, "stmt")
 
     def visitPrint(self, ctx: LanguageParser.PrintContext):
-        return self.generic_visit("print", ctx)
+        return self.generic_visit(ctx, "print")
 
     def visitLiteral(self, ctx: LanguageParser.LiteralContext):
-        return self.generic_visit("Literal: " + ctx.getText().replace('"', "'"), ctx)
-
-    def visitSet(self, ctx: LanguageParser.SetContext):
-        return self.generic_visit("Set " + ctx.getText(), ctx)
-
-    def visitSet_elem(self, ctx: LanguageParser.Set_elemContext):
-        return self.generic_visit(ctx.getText(), ctx)
-
-    def visitList(self, ctx: LanguageParser.ListContext):
-        return self.generic_visit("List " + ctx.getText(), ctx)
+        return self.generic_visit(ctx, f"literal: {ctx.getText()}")
 
     def visitVal(self, ctx: LanguageParser.ValContext):
-        return self.generic_visit("Val " + ctx.getText().replace('"', "'"), ctx)
+        return self.generic_visit(ctx, f"val: {ctx.getText()}")
 
     def visitVar(self, ctx: LanguageParser.VarContext):
-        return self.generic_visit("Var: " + ctx.getText().replace('"', "'"), ctx)
+        return self.generic_visit(ctx, f"var: {ctx.getText()}")
 
-    def visitExpr(self, ctx: LanguageParser.ExprContext):
-        return self.generic_visit("Expr: " + ctx.getText().replace('"', "'"), ctx)
-
-    def visitLambda(self, ctx: LanguageParser.LambdaContext):
-        return self.generic_visit("Lambda", ctx)
-
-    def visitPattern(self, ctx: LanguageParser.PatternContext):
-        return self.generic_visit("lambda_pattern", ctx)
+    def visitLambdaExpr(self, ctx: LanguageParser.LambdaExprContext):
+        return self.generic_visit(ctx, "lambda")
 
     def get_dot_graph(self):
         return "digraph {\n" + "\n".join(self.graph) + "\n}"
