@@ -15,7 +15,7 @@ def execute_program(
     error_checker = ErrorCheckerVisitor()
     error_checker.visit(program_context)
     if error_checker.has_error:
-        print("Execution stopped due to errors.", file=output_stream)
+        print("Parsing error.", file=output_stream)
         return
 
     program_executor = ExecutorVisitor(output_stream)
@@ -23,7 +23,7 @@ def execute_program(
         program_executor.visit(program_context)
     except TypingError as typing_error:
         print(typing_error, file=output_stream)
-        print("Execution stopped due to previous error.", file=output_stream)
+        print("An error occurred during execution, execution aborted.", file=output_stream)
         return
 
 
