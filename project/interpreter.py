@@ -23,7 +23,9 @@ def execute_program(
         program_executor.visit(program_context)
     except TypingError as typing_error:
         print(typing_error, file=output_stream)
-        print("An error occurred during execution, execution aborted.", file=output_stream)
+        print(
+            "An error occurred during execution, execution aborted.", file=output_stream
+        )
         return
 
 
