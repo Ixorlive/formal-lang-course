@@ -1,5 +1,5 @@
-from typing import Tuple, Iterable, Set, Tuple, Dict
-from pyformlang.finite_automaton import EpsilonNFA
+from typing import Tuple, Iterable, Set, Tuple, Dict, Any
+from pyformlang.finite_automaton import EpsilonNFA, State, Epsilon
 from networkx import MultiDiGraph
 from scipy.sparse import dok_matrix, block_diag
 
@@ -21,6 +21,54 @@ def intersect(fa1: EpsilonNFA, fa2: EpsilonNFA) -> EpsilonNFA:
     fa1_matrix = BooleanAdjacencyMatrix(fa1)
     fa2_matrix = BooleanAdjacencyMatrix(fa2)
     return fa1_matrix.get_intersection(fa2_matrix).to_nfa()
+
+
+def union(fa1: EpsilonNFA, fa2: EpsilonNFA) -> EpsilonNFA:
+    result = EpsilonNFA()
+
+    for automaton, idx in ((fa1, 1), (fa2, 2)):
+        for from_state, symbol, to_state in automaton:
+            result.add_transition(
+                (idx, from_state.value), symbol, (idx, to_state.value)
+            )
+        for start_state in automaton.start_states:
+            result.add_start_state((idx, start_state.value))
+        for final_state in automaton.final_states:
+            result.add_final_state((idx, final_state.value))
+
+    return result
+
+
+def concat(fa1: EpsilonNFA, fa2: EpsilonNFA) -> EpsilonNFA:
+    result = EpsilonNFA()
+
+    for automaton, idx in ((fa1, 1), (fa2, 2)):
+        for from_state, symbol, to_state in automaton:
+            result.add_transition(
+                (idx, from_state.value), symbol, (idx, to_state.value)
+            )
+
+    for start_state in fa1.start_states:
+        result.add_start_state((1, start_state.value))
+        for final_state in fa2.final_states:
+            result.add_transition(
+                (1, start_state.value), Epsilon(), (2, final_state.value)
+            )
+
+    for final_state in fa2.final_states:
+        result.add_final_state((2, final_state.value))
+
+    return result
+
+
+def apply_star(fa: EpsilonNFA) -> EpsilonNFA:
+    result = fa.copy()
+
+    for start_state in result.start_states:
+        for final_state in result.final_states:
+            result.add_transition(final_state, Epsilon(), start_state)
+
+    return result
 
 
 def regular_query(
@@ -116,6 +164,26 @@ def find_accessible_by_matrices(
         states_dict,
         for_each,
     )
+
+
+def find_accessible_by_nfa(nfa: EpsilonNFA) -> Set[Tuple[Any, Any]]:
+    bam = BooleanAdjacencyMatrix(nfa)
+    tc_matrix = bam.get_transitive_closure()
+
+    rev_idx = {i: k for k, i in bam.states.items()}
+
+    from_idx, to_idx = tc_matrix.nonzero()
+    reachable_pairs = set(
+        (rev_idx[fro], rev_idx[to]) for fro, to in zip(from_idx, to_idx)
+    )
+
+    result = set(
+        (fro_id, to_id)
+        for fro_id, to_id in reachable_pairs
+        if fro_id in nfa.start_states and to_id in nfa.final_states
+    )
+
+    return result
 
 
 def _initialize_state_matrices(
