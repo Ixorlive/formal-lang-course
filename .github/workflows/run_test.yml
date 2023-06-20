@@ -1,17 +1,23 @@
 name: Run tests
 
+# Controls when the workflow will run
 on:
-  [ push, pull_request ]
+  # Triggers the workflow on push or pull request events
+  - push
+  - pull_request
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  test:
-    name: Run tests on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  tests:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+    # A strategy creates a build matrix for your jobs
     strategy:
-      fail-fast: false
+      # You can define a matrix of different job configurations
       matrix:
-        python-version: [ 3.8 ]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        # Each option you define in the matrix has a key and value
+        python-version: [ "3.10" ]
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Set up Git repository
         uses: actions/checkout@v2
@@ -21,9 +27,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      # Install requirements
+      - name: Install requirements
+
+        # Runs command-line programs using the operating system's shell
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip wheel setuptools
           python -m pip install -r requirements.txt
+          python -m pip list
+
+      - name: Generate ANTLR4 files
+        run: |
+          cd project
+          antlr4 -Dlanguage=Python3 Language.g4 -o antlr -visitor
+
       - name: Run tests
         run: python ./scripts/run_tests.py
